@@ -1,0 +1,94 @@
+void sarjaohjaus() {
+  int i = 0;
+  char strArray[10] = "         ";   
+  String sanoma,arvo,arvo2,arvo3;
+  int tmpval; 
+  boolean sanomaValmis = false;
+  byte val;
+while (1==1) {   
+ if (Serial.available()) {  
+   
+    val = Serial.read();
+    //Serial.print(val);
+    // odotetaan kunnes loytyy alkumerkki  
+    if(val == '<') {
+        i=0;    
+        while (Serial.available() && !sanomaValmis && i<10){            
+          val = Serial.read();
+         
+          //oliko loppumerkki
+          if (val=='>') { 
+            sanomaValmis=true; 
+          } else {
+            sanoma+=val;
+            // strArray[i]=val; //laitetaan merkki bufferiin
+          }
+          
+          i++; 
+    
+        }
+      
+        if (sanomaValmis && sanoma.length()==9) {
+          Serial.print("SAIN:");
+          Serial.println(sanoma);
+          
+          char carray1[4];// X konvertoidaan string->char->nro
+          arvo = sanoma.substring(0, 3);
+      arvo.toCharArray(carray1, sizeof(carray1));
+      tmpval = atoi(carray1);
+          /*if (tmpval=-1) { 
+            
+            // gravitaatio
+            gravitaatio();
+            
+          } else if (tmpval=-2) { 
+            pompotus();
+          
+          } else if (tmpval=-3) {
+            teespiraali();
+            
+          } else
+          
+          {*/
+                        if (tmpval<180 && tmpval>0) {
+                          x=tmpval;
+                         // Serial.print("X oli:");
+                         // Serial.println(x);
+                          hservo.write(x);
+                        } 
+                        char carray2[4]; //Y konvertoidaan string->char->nro
+                        tmpval=0;
+                        arvo2 = sanoma.substring(4, 7);
+                        arvo2.toCharArray(carray2, sizeof(carray2));
+                        tmpval = atoi(carray2);
+                        if (tmpval<180 && tmpval>0) {
+                          y=tmpval;
+                          //Serial.print("Y oli:");
+                          //Serial.println(y);
+                          vservo.write(y);
+                        }
+                        char carray3[2]; //Y konvertoidaan string->char->nro
+                        tmpval=0;
+                        arvo3 = sanoma.substring(8, 9);
+                        /*              Serial.print("Laser oli:");
+                          Serial.println(arvo3);*/
+                        arvo3.toCharArray(carray3, sizeof(carray3));
+                        tmpval = atoi(carray3);
+                           /*  Serial.print("Laser oli:");
+                          Serial.println(tmpval);*/
+                        if (tmpval==0) {
+                          digitalWrite(LASER,LOW);
+                        }
+                        if (tmpval==1) {
+                          digitalWrite(LASER,HIGH);
+                        }
+                      }
+        //}            
+          sanomaValmis=false;
+          sanoma="";
+    }
+
+ }
+ delay(15);
+}
+}
