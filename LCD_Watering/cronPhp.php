@@ -97,7 +97,7 @@ class cronPHP{
 			else
 				$month=$m;
 
-			if($wd="*")
+			if($wd=="*")
 				$weekday=$curWeekDay;
 			else
 				$weekday=$wd;
