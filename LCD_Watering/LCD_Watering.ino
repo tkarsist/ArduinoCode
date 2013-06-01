@@ -4,6 +4,20 @@
 #define TRIGGER_PIN  6
 #define ECHO_PIN     7
 #define MAX_DISTANCE 500 
+#define Length 25
+
+
+typedef struct {
+  String message;
+  int type;
+  
+} 
+messageStruct;
+
+messageStruct lcdMessages[Length];
+
+int lcdMessagesIndex=0;
+
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
 int distance;
 int showDistance=70;
@@ -11,7 +25,6 @@ int showDistance=70;
 TM1638 module(3, 4, 5);
 
 String sanoma = "";
-String nayttosanoma="";
 boolean sanomaReady = false;
 boolean sanomaOngoing = false;
 
@@ -19,11 +32,16 @@ unsigned long a=1200;
 unsigned long b=600;
 int c=200;
 
+unsigned long int breachTime=0;
+int lcdMessageDelay=1000;
+boolean breachOngoing=false;
+
 void setup(){
-module.setDisplayToString("SHOOT   ");
-Serial.begin(115200);
-Serial.println("-----");
-Serial.println("Ready");
+  module.setDisplayToString("SHOOT   ");
+  initLcdMessages();
+  Serial.begin(115200);
+  Serial.println("-----");
+  Serial.println("Ready");
 
 }
 
@@ -32,17 +50,24 @@ void loop()
   delay(50);
   int uS = sonar.ping();
   distance=uS / US_ROUNDTRIP_CM;
+  if(breachOngoing||distance<showDistance){
+    perimeterBreach();
+  }
+  
   //Serial.println(distance);
+  /*
   if (distance<showDistance){
       //Serial.println("nyt sanomaa");
       //Serial.println(nayttosanoma);
-      lcdMessage();
+    setLcdMessage(nayttosanoma);
   }
   else{
     module.clearDisplay();
   }
+  */
   if(module.getButtons() != 0b00000000){
-    nayttosanoma="";
+    breachOngoing=false;
+    initLcdMessages();
     module.clearDisplay();
     //sanoma="          ";
     //lcdMessage();
@@ -76,15 +101,63 @@ void readSerialMessage(){
   }
   //sanoma valmis
   if (sanomaReady) {
-    lcdMessage();
-    nayttosanoma=sanoma;
+    //nayttosanoma=sanoma;
+    //setLcdMessage(nayttosanoma);
+    String nayttosanoma=sanoma;
+    int mtype=1;
+    addLcdMessage(nayttosanoma,mtype);
     sanoma = "";
     sanomaReady = false;
   }
- }
 }
-void lcdMessage(){
-  module.setDisplayToString(nayttosanoma);
+}
+void setLcdMessage(String lsanoma){
+  module.setDisplayToString(lsanoma);
 
 
 }
+
+void  addLcdMessage(String sanoma, int type){
+  if(lcdMessagesIndex==(Length-1)){
+    lcdMessagesIndex=0;
+  }
+  else
+  {
+    lcdMessagesIndex+=1;
+  }
+  lcdMessages[lcdMessagesIndex].message=sanoma;
+  lcdMessages[lcdMessagesIndex].type=type;
+
+}
+
+void perimeterBreach(){
+  if(breachOngoing){
+    int counter=0;
+    for (int i=0;i<Length;i++){
+      if(lcdMessages[i].message!=""){
+        if(counter==0 && ((millis()-breachTime)<(i+1)*lcdMessageDelay)){
+          setLcdMessage(lcdMessages[i].message);
+          counter=counter+1;
+        }
+      }
+    }
+    if(counter==0){
+      breachOngoing=false;
+      module.clearDisplay();
+    }
+  }
+  else{
+    breachOngoing=true;
+    breachTime=millis();
+  }
+}
+
+void initLcdMessages(){
+  for (int i=0;i<Length;i++){
+    lcdMessages[i].message="";
+  }
+
+}
+
+
+
