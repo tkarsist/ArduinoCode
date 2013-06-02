@@ -3,7 +3,7 @@
 
 #define TRIGGER_PIN  6
 #define ECHO_PIN     7
-#define MAX_DISTANCE 500 
+#define MAX_DISTANCE 300 
 #define Length 25
 
 
@@ -19,8 +19,8 @@ messageStruct lcdMessages[Length];
 int lcdMessagesIndex=0;
 
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
-int distance;
-int showDistance=70;
+int distance=0;
+int showDistance=140;
 // define a module on data pin 8, clock pin 9 and strobe pin 7
 TM1638 module(3, 4, 5);
 
@@ -35,6 +35,8 @@ int c=200;
 unsigned long int breachTime=0;
 int lcdMessageDelay=1000;
 boolean breachOngoing=false;
+unsigned long int sonarTime=0;
+int sonarDelay=150;
 
 void setup(){
   module.setDisplayToString("SHOOT   ");
@@ -47,11 +49,15 @@ void setup(){
 
 void loop()
 {
-  delay(50);
-  int uS = sonar.ping();
+  if((millis()-sonarTime)>sonarDelay){
+  //delay(50);
+  int uS = sonar.ping_median(10); //sonar.ping();
   distance=uS / US_ROUNDTRIP_CM;
+  sonarTime=millis();
+  }
   if(breachOngoing||distance<showDistance){
     perimeterBreach();
+    //Serial.println(distance);
   }
   
   //Serial.println(distance);
@@ -84,6 +90,8 @@ void readSerialMessage(){
 
   if (ch == '!') {
     Serial.println("Program reset");
+    initLcdMessages();
+    module.clearDisplay();
   }
   //viestin alku
   if (ch == '<') {
@@ -136,6 +144,7 @@ void perimeterBreach(){
     for (int i=0;i<Length;i++){
       if(lcdMessages[i].message!=""){
         if(counter==0 && ((millis()-breachTime)<(i+1)*lcdMessageDelay)){
+          //module.clearDisplay();
           setLcdMessage(lcdMessages[i].message);
           counter=counter+1;
         }

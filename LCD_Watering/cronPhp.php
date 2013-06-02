@@ -41,72 +41,75 @@ class cronPHP{
 			if($this->isSameMinute($this->time,$this->lastrun))
 				return false;
 			else{
-				$this->updateCronJob();
-				return true;
+					$this->updateCronJob();
+					return true;
+				}
 			}
+			return false;	
 		}
-		return false;	
-	}
 
-	private function updateCronJob(){
-		$this->time=time();
-		$this->lastrun=$this->time;
+		private function updateCronJob(){
+			$this->time=time();
+			$this->lastrun=$this->time;
 
-	}
+		}
 
-	private function isSameMinute($curStamp,$destStamp){
-		if ($curStamp>=$destStamp && date ("d-M-Y H:i",$curStamp)==date ("d-M-Y H:i",$destStamp))
-			return true;
-		return false;
-	}
+		private function isSameMinute($curStamp,$destStamp){
+			if ($curStamp>=$destStamp && date ("d-M-Y H:i",$curStamp)==date ("d-M-Y H:i",$destStamp))
+				return true;
+			return false;
+		}
 
-	private function crontToTimestamp($i,$h,$d,$m,$wd){
-		$sec=0;
-		$min=0;
-		$hour=0;
-		$day=0;
-		$month=0;
-		$weekday=-0;
+		private function crontToTimestamp($i,$h,$d,$m,$wd){
+			$sec=0;
+			$min=0;
+			$hour=0;
+			$day=0;
+			$month=0;
+			$weekday=-0;
 
 
-		$tid=time();
-		$curMin=date("i",$tid);
-		$curHour=date("H",$tid);
-		$curDay=date("d",$tid);
-		$curMonth=date("m",$tid);
-		$curWeekDay=date("N",$tid);
-		$year=date("Y",$tid);
+			$tid=time();
+			$curMin=date("i",$tid);
+			$curHour=date("H",$tid);
+			$curDay=date("d",$tid);
+			$curMonth=date("m",$tid);
+			$curWeekDay=date("N",$tid);
+			$year=date("Y",$tid);
 
-		if($i=="*")
-			$min=$curMin;
-		else
-			$min=$i;
+			if($i=="*")
+				$min=$curMin;
+			else
+				$min=$i;
 
-		if($h=="*")
-			$hour=$curHour;
-		else
-			$hour=$h;
+			if($h=="*")
+				$hour=$curHour;
+			else
+				$hour=$h;
 
-		if($d=="*")
-			$day=$curDay;
-		else
-			$day=$d;
+			if($d=="*")
+				$day=$curDay;
+			else
+				$day=$d;
 
-		if($m=="*")
-			$month=$curMonth;
-		else
-			$month=$m;
+			if($m=="*")
+				$month=$curMonth;
+			else
+				$month=$m;
 
-		if($wd=="*")
-			$weekday=$curWeekDay;
-		else
-			$weekday=$wd;
+			if($wd=="*")
+				$weekday=$curWeekDay;
+			else
+				$weekday=$wd;
 
-		$tstamp=mktime($hour,$min,$sec,$month,$day,$year);
+			$tstamp=mktime($hour,$min,$sec,$month,$day,$year);
+			if($weekday!=$curWeekDay){
+				$tstamp=0;
+			}
 	//echo $tstamp;
-		return $tstamp;
+			return $tstamp;
+		}
+
+
 	}
-
-
-}
 ?>
