@@ -3,7 +3,7 @@
 
 #define TRIGGER_PIN  6
 #define ECHO_PIN     7
-#define MAX_DISTANCE 300 
+#define MAX_DISTANCE 250 
 #define Length 25
 
 
@@ -20,7 +20,7 @@ int lcdMessagesIndex=0;
 
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
 int distance=0;
-int showDistance=140;
+int showDistance=120;
 // define a module on data pin 8, clock pin 9 and strobe pin 7
 TM1638 module(3, 4, 5);
 
@@ -37,6 +37,9 @@ int lcdMessageDelay=1000;
 boolean breachOngoing=false;
 unsigned long int sonarTime=0;
 int sonarDelay=150;
+double ledStepSize= showDistance/8;
+unsigned long ledCheckTime=0;
+int ledCheckInterval=5;
 
 void setup(){
   module.setDisplayToString("SHOOT   ");
@@ -51,26 +54,44 @@ void loop()
 {
   if((millis()-sonarTime)>sonarDelay){
   //delay(50);
-  int uS = sonar.ping_median(10); //sonar.ping();
+  int uS = sonar.ping(); //sonar.ping();
   distance=uS / US_ROUNDTRIP_CM;
   sonarTime=millis();
+  //module.setDisplayToDecNumber(distance,0,false);
   }
   if(breachOngoing||distance<showDistance){
     perimeterBreach();
     //Serial.println(distance);
+    
+    if(distance<showDistance){
+  int leds=distance/ledStepSize;
+  setXLeds(leds);
+  //Serial.println(leds);
+  //Serial.println(distance);
+}
   }
   
-  //Serial.println(distance);
+
+  
   /*
-  if (distance<showDistance){
-      //Serial.println("nyt sanomaa");
-      //Serial.println(nayttosanoma);
-    setLcdMessage(nayttosanoma);
+  if((millis()-ledCheckTime)>ledCheckInterval){
+    ledCheckTime=millis();
+   if(distance<showDistance){
+      clearAllLeds();
+      double z=distance/ledStepSize;
+      for(int i=0;i<=z;i++){
+        module.setLED(TM1638_COLOR_GREEN,i);
+   
+      Serial.println(distance);
+
+      }
+  }*/
+  if(distance>=showDistance){
+    clearAllLeds();
   }
-  else{
-    module.clearDisplay();
-  }
-  */
+
+  
+
   if(module.getButtons() != 0b00000000){
     breachOngoing=false;
     initLcdMessages();
@@ -81,6 +102,23 @@ void loop()
 
   readSerialMessage();
 
+}
+
+void setXLeds(int leds){
+  for(int i=0;i<leds;i++){
+    module.setLED(TM1638_COLOR_GREEN,i);
+  }
+  for(int i=7;i>=leds;i--){
+    module.setLED(TM1638_COLOR_NONE,i);
+  }
+
+}
+
+void clearAllLeds(){
+    for(int i=0;i<8;i++){
+      module.setLED(TM1638_COLOR_NONE,i);
+   
+    }
 }
 
 void readSerialMessage(){
@@ -140,17 +178,19 @@ void  addLcdMessage(String sanoma, int type){
 
 void perimeterBreach(){
   if(breachOngoing){
+    boolean isShown=false;
     int counter=0;
     for (int i=0;i<Length;i++){
       if(lcdMessages[i].message!=""){
-        if(counter==0 && ((millis()-breachTime)<(i+1)*lcdMessageDelay)){
+        counter=counter+1;
+        if(isShown==false && ((millis()-breachTime)<(counter)*lcdMessageDelay)){
           //module.clearDisplay();
           setLcdMessage(lcdMessages[i].message);
-          counter=counter+1;
+          isShown=true;
         }
       }
     }
-    if(counter==0){
+    if(isShown==false){
       breachOngoing=false;
       module.clearDisplay();
     }
