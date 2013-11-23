@@ -1,163 +1,349 @@
-/* Blink without Delay
- 
- Turns on and off a light emitting diode(LED) connected to a digital  
- pin, without using the delay() function.  This means that other code
- can run at the same time without being interrupted by the LED code.
- 
- The circuit:
- * LED attached from pin 13 to ground.
- * Note: on most Arduinos, there is already an LED on the board
- that's attached to pin 13, so no hardware is needed for this example.
- 
- 
- created 2005
- by David A. Mellis
- modified 8 Feb 2010
- by Paul Stoffregen
- 
- This example code is in the public domain.
+//
+//hubber bubber
+typedef struct{
+  int ledPin;
+  long startTime;
+  long offInterval;
+  long raiseInterval;
+  long onInterval;
+  long lowerInterval;
 
- 
- http://www.arduino.cc/en/Tutorial/BlinkWithoutDelay
- */
+  int offMin;
+  int offMax;
+  int raiseMin;
+  int raiseMax;
+  int onMin;
+  int onMax;
+  int lowerMin;
+  int lowerMax;
 
-// constants won't change. Used here to 
-// set pin numbers:
-const int ledPin =  9;      // the number of the LED pin
+  //state 0=start, 1=off, 2=raise, 3=on, 4 lower 
+  int state;
+  int running;
+  int maxBrightness;
+}
+ledSeries;
 
-// Variables will change:
-int ledState = LOW;             // ledState used to set the LED
-long previousMillis = 0;        // will store last time LED was updated
-long startTime=0;
+void generateRandomTimes(ledSeries *ledSeriesX);
+void changeState(ledSeries *ledSeriesX);
 
-// the follow variables is a long because the time, measured in miliseconds,
-// will quickly become a bigger number than can be stored in an int.
-long interval = 100;           // interval at which to blink (milliseconds)
-int i=0;
+ledSeries ledSeries1;
+ledSeries ledSeries2;
+ledSeries ledSeries3;
 
-long offInterval=0;
-long raiseInterval=0;
-long onInterval=0;
-long lowerInterval=0;
-
-int offMin=500;
-int offMax=1000;
-int raiseMin=1000;
-int raiseMax=4000;
-int onMin=500;
-int onMax=1000;
-int lowerMin=1000;
-int lowerMax=4000;
-
-
-//state 0=start, 1=off, 2=raise, 3=on, 4 lower 
-
-int state=0;
-int running=0;
-int maxBrightness=255;
 
 void setup() {
   // set the digital pin as output:
-  pinMode(ledPin, OUTPUT);
+ledSeries1.ledPin=9;
+ledSeries1.startTime=0;
+ledSeries1.offInterval=0;
+ledSeries1.raiseInterval=0;
+ledSeries1.onInterval=0;
+ledSeries1.lowerInterval=0;
+
+ledSeries1.offMin=500;
+ledSeries1.offMax=1000;
+ledSeries1.raiseMin=1000;
+ledSeries1.raiseMax=4000;
+ledSeries1.onMin=500;
+ledSeries1.onMax=1000;
+ledSeries1.lowerMin=1000;
+ledSeries1.lowerMax=4000;
+
+//state 0=start, 1=off, 2=raise, 3=on, 4 lower 
+ledSeries1.state=0;
+ledSeries1.running=0;
+ledSeries1.maxBrightness=255;
+
+
+//Series 2
+ledSeries2.ledPin=10;
+ledSeries2.startTime=0;
+ledSeries2.offInterval=0;
+ledSeries2.raiseInterval=0;
+ledSeries2.onInterval=0;
+ledSeries2.lowerInterval=0;
+
+ledSeries2.offMin=500;
+ledSeries2.offMax=1000;
+ledSeries2.raiseMin=1000;
+ledSeries2.raiseMax=4000;
+ledSeries2.onMin=500;
+ledSeries2.onMax=1000;
+ledSeries2.lowerMin=1000;
+ledSeries2.lowerMax=4000;
+
+//state 0=start, 1=off, 2=raise, 3=on, 4 lower 
+ledSeries2.state=0;
+ledSeries2.running=0;
+ledSeries2.maxBrightness=255;
+
+//Series 3
+ledSeries3.ledPin=11;
+ledSeries3.startTime=0;
+ledSeries3.offInterval=0;
+ledSeries3.raiseInterval=0;
+ledSeries3.onInterval=0;
+ledSeries3.lowerInterval=0;
+
+ledSeries3.offMin=500;
+ledSeries3.offMax=1000;
+ledSeries3.raiseMin=1000;
+ledSeries3.raiseMax=4000;
+ledSeries3.onMin=500;
+ledSeries3.onMax=1000;
+ledSeries3.lowerMin=1000;
+ledSeries3.lowerMax=4000;
+
+//state 0=start, 1=off, 2=raise, 3=on, 4 lower 
+ledSeries3.state=0;
+ledSeries3.running=0;
+ledSeries3.maxBrightness=255;
+  //
+  pinMode(ledSeries1.ledPin, OUTPUT);
+  pinMode(ledSeries2.ledPin, OUTPUT);
+  pinMode(ledSeries3.ledPin, OUTPUT);
+
   Serial.begin(57600);
   Serial.println("Ready");  
 }
 
-void loop()
-{
-  // here is where you'd put code that needs to be running all the time.
-
-  // check to see if it's time to blink the LED; that is, if the 
-  // difference between the current time and last time you blinked 
-  // the LED is bigger than the interval at which you want to 
-  // blink the LED.
-  
-  if(state==0){
-    generateRandomTimes();
-    state=1;
+void loop(){
+  //alkutila
+  if(ledSeries1.state==0){
+    generateRandomTimes(&ledSeries1);
+    ledSeries1.state=1;
   }
 
   //state OFF
-  if(state==1){
-    Serial.println("off");
-    if(running==0){
-      startTime=millis();
-      running=1;
+  if(ledSeries1.state==1){
+    //Serial.println("off");
+    if(ledSeries1.running==0){
+      ledSeries1.startTime=millis();
+      ledSeries1.running=1;
     }
-    if(millis()-startTime<offInterval){
-      analogWrite(ledPin,0);
+    if(millis()-ledSeries1.startTime<ledSeries1.offInterval){
+      analogWrite(ledSeries1.ledPin,0);
     }
     else{
-      changeState();
+      changeState(&ledSeries1);
     }
   }
   
   //raising
-  if(state==2){
-    Serial.println("rising");
-    if(running==0){
-      startTime=millis();
-      running=1;
+  if(ledSeries1.state==2){
+    //Serial.println("rising");
+    if(ledSeries1.running==0){
+      ledSeries1.startTime=millis();
+      ledSeries1.running=1;
     }
-    if(millis()-startTime<raiseInterval){
-      long diff=raiseInterval-(millis()-startTime);
-      long pinVal=(1-diff/raiseInterval)*maxBrightness;
-      Serial.println(1-diff/raiseInterval);
+    if(millis()-ledSeries1.startTime<ledSeries1.raiseInterval){
+      long diff=ledSeries1.raiseInterval-(millis()-ledSeries1.startTime);
+      long pinVal=(1-diff/ledSeries1.raiseInterval)*ledSeries1.maxBrightness;
+      Serial.println(1-diff/ledSeries1.raiseInterval);
 
-      analogWrite(ledPin,pinVal);
+      analogWrite(ledSeries1.ledPin,pinVal);
     }
     else{
-      changeState();
+      changeState(&ledSeries1);
     }
   }
   
   //On
-  if(state==3){
-    Serial.println("on");
-    if(running==0){
-      startTime=millis();
-      running=1;
+  if(ledSeries1.state==3){
+    //Serial.println("on");
+    if(ledSeries1.running==0){
+      ledSeries1.startTime=millis();
+      ledSeries1.running=1;
     }
-    if(millis()-startTime<onInterval){
+    if(millis()-ledSeries1.startTime<ledSeries1.onInterval){
       //analogWrite(ledPin,255);
     }
     else{
-      changeState();
+      changeState(&ledSeries1);
     }
   }    
   //Lower
-  if(state==4){
-    Serial.println("Dimming");
-    if(running==0){
-      startTime=millis();
-      running=1;
+  if(ledSeries1.state==4){
+    //Serial.println("Dimming");
+    if(ledSeries1.running==0){
+      ledSeries1.startTime=millis();
+      ledSeries1.running=1;
     }
-    if(millis()-startTime<lowerInterval){
-      int diff=lowerInterval-(millis()-startTime);
-      int pinVal=maxBrightness-(diff/raiseInterval*maxBrightness);
-      analogWrite(ledPin,pinVal);
+    if(millis()-ledSeries1.startTime<ledSeries1.lowerInterval){
+      int diff=ledSeries1.lowerInterval-(millis()-ledSeries1.startTime);
+      int pinVal=ledSeries1.maxBrightness-(diff/ledSeries1.raiseInterval*ledSeries1.maxBrightness);
+      analogWrite(ledSeries1.ledPin,pinVal);
 
     }
     else{
-      changeState();
+      changeState(&ledSeries1);
+    }
+  }      
+
+//Series2
+
+    //alkutila
+  if(ledSeries2.state==0){
+    generateRandomTimes(&ledSeries2);
+    ledSeries2.state=1;
+  }
+
+  //state OFF
+  if(ledSeries2.state==1){
+    //Serial.println("off");
+    if(ledSeries2.running==0){
+      ledSeries2.startTime=millis();
+      ledSeries2.running=1;
+    }
+    if(millis()-ledSeries2.startTime<ledSeries2.offInterval){
+      analogWrite(ledSeries2.ledPin,0);
+    }
+    else{
+      changeState(&ledSeries2);
+    }
+  }
+  
+  //raising
+  if(ledSeries2.state==2){
+    //Serial.println("rising");
+    if(ledSeries2.running==0){
+      ledSeries2.startTime=millis();
+      ledSeries2.running=1;
+    }
+    if(millis()-ledSeries2.startTime<ledSeries2.raiseInterval){
+      long diff=ledSeries2.raiseInterval-(millis()-ledSeries2.startTime);
+      long pinVal=(1-diff/ledSeries2.raiseInterval)*ledSeries2.maxBrightness;
+      Serial.println(1-diff/ledSeries2.raiseInterval);
+
+      analogWrite(ledSeries2.ledPin,pinVal);
+    }
+    else{
+      changeState(&ledSeries2);
+    }
+  }
+  
+  //On
+  if(ledSeries2.state==3){
+    //Serial.println("on");
+    if(ledSeries2.running==0){
+      ledSeries2.startTime=millis();
+      ledSeries2.running=1;
+    }
+    if(millis()-ledSeries2.startTime<ledSeries2.onInterval){
+      //analogWrite(ledPin,255);
+    }
+    else{
+      changeState(&ledSeries2);
+    }
+  }    
+  //Lower
+  if(ledSeries2.state==4){
+    //Serial.println("Dimming");
+    if(ledSeries2.running==0){
+      ledSeries2.startTime=millis();
+      ledSeries2.running=1;
+    }
+    if(millis()-ledSeries2.startTime<ledSeries2.lowerInterval){
+      int diff=ledSeries2.lowerInterval-(millis()-ledSeries2.startTime);
+      int pinVal=ledSeries2.maxBrightness-(diff/ledSeries2.raiseInterval*ledSeries2.maxBrightness);
+      analogWrite(ledSeries2.ledPin,pinVal);
+
+    }
+    else{
+      changeState(&ledSeries2);
+    }
+  } 
+//Series 3
+  //alkutila
+  if(ledSeries3.state==0){
+    generateRandomTimes(&ledSeries3);
+    ledSeries3.state=1;
+  }
+
+  //state OFF
+  if(ledSeries3.state==1){
+    //Serial.println("off");
+    if(ledSeries3.running==0){
+      ledSeries3.startTime=millis();
+      ledSeries3.running=1;
+    }
+    if(millis()-ledSeries3.startTime<ledSeries3.offInterval){
+      analogWrite(ledSeries3.ledPin,0);
+    }
+    else{
+      changeState(&ledSeries3);
+    }
+  }
+  
+  //raising
+  if(ledSeries3.state==2){
+    //Serial.println("rising");
+    if(ledSeries3.running==0){
+      ledSeries3.startTime=millis();
+      ledSeries3.running=1;
+    }
+    if(millis()-ledSeries3.startTime<ledSeries3.raiseInterval){
+      long diff=ledSeries3.raiseInterval-(millis()-ledSeries3.startTime);
+      long pinVal=(1-diff/ledSeries3.raiseInterval)*ledSeries3.maxBrightness;
+      Serial.println(1-diff/ledSeries3.raiseInterval);
+
+      analogWrite(ledSeries3.ledPin,pinVal);
+    }
+    else{
+      changeState(&ledSeries3);
+    }
+  }
+  
+  //On
+  if(ledSeries3.state==3){
+    //Serial.println("on");
+    if(ledSeries3.running==0){
+      ledSeries3.startTime=millis();
+      ledSeries3.running=1;
+    }
+    if(millis()-ledSeries3.startTime<ledSeries3.onInterval){
+      //analogWrite(ledPin,255);
+    }
+    else{
+      changeState(&ledSeries3);
+    }
+  }    
+  //Lower
+  if(ledSeries3.state==4){
+    //Serial.println("Dimming");
+    if(ledSeries3.running==0){
+      ledSeries3.startTime=millis();
+      ledSeries3.running=1;
+    }
+    if(millis()-ledSeries3.startTime<ledSeries3.lowerInterval){
+      int diff=ledSeries3.lowerInterval-(millis()-ledSeries3.startTime);
+      int pinVal=ledSeries3.maxBrightness-(diff/ledSeries3.raiseInterval*ledSeries3.maxBrightness);
+      analogWrite(ledSeries3.ledPin,pinVal);
+
+    }
+    else{
+      changeState(&ledSeries3);
     }
   }      
 
 }
 
-void generateRandomTimes(){
-    offInterval=random(offMin,offMax);
-    raiseInterval=random(raiseMin,raiseMax);
-    onInterval=random(onMin,onMax);
-    lowerInterval=random(lowerMin,lowerMax);
+void generateRandomTimes(ledSeries *ledSeriesX){
+    ledSeriesX->offInterval=random(ledSeriesX->offMin,ledSeriesX->offMax);
+    ledSeriesX->raiseInterval=random(ledSeriesX->raiseMin,ledSeriesX->raiseMax);
+    ledSeriesX->onInterval=random(ledSeriesX->onMin,ledSeriesX->onMax);
+    ledSeriesX->lowerInterval=random(ledSeriesX->lowerMin,ledSeriesX->lowerMax);
+   
 }
 
-void changeState(){
-  if(state < 4){
-    state=state+1;
+void changeState(ledSeries *ledSeriesX){
+  if(ledSeriesX->state < 4){
+    ledSeriesX->state=ledSeriesX->state+1;
   }
   else
-    state=0;
-  running=0;  
+    ledSeriesX->state=0;
+    ledSeriesX->running=0;  
+  
 }
 
