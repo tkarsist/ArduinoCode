@@ -26,6 +26,7 @@ ledSeries;
 
 void generateRandomTimes(ledSeries *ledSeriesX);
 void changeState(ledSeries *ledSeriesX);
+void executeLedJob(ledSeries *ledSeriesX);
 
 ledSeries ledSeries1;
 ledSeries ledSeries2;
@@ -109,223 +110,11 @@ ledSeries3.maxBrightness=255;
 }
 
 void loop(){
-  //alkutila
-  if(ledSeries1.state==0){
-    generateRandomTimes(&ledSeries1);
-    ledSeries1.state=1;
-  }
-
-  //state OFF
-  if(ledSeries1.state==1){
-    //Serial.println("off");
-    if(ledSeries1.running==0){
-      ledSeries1.startTime=millis();
-      ledSeries1.running=1;
-    }
-    if(millis()-ledSeries1.startTime<ledSeries1.offInterval){
-      analogWrite(ledSeries1.ledPin,0);
-    }
-    else{
-      changeState(&ledSeries1);
-    }
-  }
   
-  //raising
-  if(ledSeries1.state==2){
-    //Serial.println("rising");
-    if(ledSeries1.running==0){
-      ledSeries1.startTime=millis();
-      ledSeries1.running=1;
-    }
-    if(millis()-ledSeries1.startTime<ledSeries1.raiseInterval){
-      long diff=ledSeries1.raiseInterval-(millis()-ledSeries1.startTime);
-      long pinVal=(1-diff/ledSeries1.raiseInterval)*ledSeries1.maxBrightness;
-      Serial.println(1-diff/ledSeries1.raiseInterval);
+  executeLedJob(&ledSeries1);
+  executeLedJob(&ledSeries2);
+  executeLedJob(&ledSeries3);
 
-      analogWrite(ledSeries1.ledPin,pinVal);
-    }
-    else{
-      changeState(&ledSeries1);
-    }
-  }
-  
-  //On
-  if(ledSeries1.state==3){
-    //Serial.println("on");
-    if(ledSeries1.running==0){
-      ledSeries1.startTime=millis();
-      ledSeries1.running=1;
-    }
-    if(millis()-ledSeries1.startTime<ledSeries1.onInterval){
-      //analogWrite(ledPin,255);
-    }
-    else{
-      changeState(&ledSeries1);
-    }
-  }    
-  //Lower
-  if(ledSeries1.state==4){
-    //Serial.println("Dimming");
-    if(ledSeries1.running==0){
-      ledSeries1.startTime=millis();
-      ledSeries1.running=1;
-    }
-    if(millis()-ledSeries1.startTime<ledSeries1.lowerInterval){
-      int diff=ledSeries1.lowerInterval-(millis()-ledSeries1.startTime);
-      int pinVal=ledSeries1.maxBrightness-(diff/ledSeries1.raiseInterval*ledSeries1.maxBrightness);
-      analogWrite(ledSeries1.ledPin,pinVal);
-
-    }
-    else{
-      changeState(&ledSeries1);
-    }
-  }      
-
-//Series2
-
-    //alkutila
-  if(ledSeries2.state==0){
-    generateRandomTimes(&ledSeries2);
-    ledSeries2.state=1;
-  }
-
-  //state OFF
-  if(ledSeries2.state==1){
-    //Serial.println("off");
-    if(ledSeries2.running==0){
-      ledSeries2.startTime=millis();
-      ledSeries2.running=1;
-    }
-    if(millis()-ledSeries2.startTime<ledSeries2.offInterval){
-      analogWrite(ledSeries2.ledPin,0);
-    }
-    else{
-      changeState(&ledSeries2);
-    }
-  }
-  
-  //raising
-  if(ledSeries2.state==2){
-    //Serial.println("rising");
-    if(ledSeries2.running==0){
-      ledSeries2.startTime=millis();
-      ledSeries2.running=1;
-    }
-    if(millis()-ledSeries2.startTime<ledSeries2.raiseInterval){
-      long diff=ledSeries2.raiseInterval-(millis()-ledSeries2.startTime);
-      long pinVal=(1-diff/ledSeries2.raiseInterval)*ledSeries2.maxBrightness;
-      Serial.println(1-diff/ledSeries2.raiseInterval);
-
-      analogWrite(ledSeries2.ledPin,pinVal);
-    }
-    else{
-      changeState(&ledSeries2);
-    }
-  }
-  
-  //On
-  if(ledSeries2.state==3){
-    //Serial.println("on");
-    if(ledSeries2.running==0){
-      ledSeries2.startTime=millis();
-      ledSeries2.running=1;
-    }
-    if(millis()-ledSeries2.startTime<ledSeries2.onInterval){
-      //analogWrite(ledPin,255);
-    }
-    else{
-      changeState(&ledSeries2);
-    }
-  }    
-  //Lower
-  if(ledSeries2.state==4){
-    //Serial.println("Dimming");
-    if(ledSeries2.running==0){
-      ledSeries2.startTime=millis();
-      ledSeries2.running=1;
-    }
-    if(millis()-ledSeries2.startTime<ledSeries2.lowerInterval){
-      int diff=ledSeries2.lowerInterval-(millis()-ledSeries2.startTime);
-      int pinVal=ledSeries2.maxBrightness-(diff/ledSeries2.raiseInterval*ledSeries2.maxBrightness);
-      analogWrite(ledSeries2.ledPin,pinVal);
-
-    }
-    else{
-      changeState(&ledSeries2);
-    }
-  } 
-//Series 3
-  //alkutila
-  if(ledSeries3.state==0){
-    generateRandomTimes(&ledSeries3);
-    ledSeries3.state=1;
-  }
-
-  //state OFF
-  if(ledSeries3.state==1){
-    //Serial.println("off");
-    if(ledSeries3.running==0){
-      ledSeries3.startTime=millis();
-      ledSeries3.running=1;
-    }
-    if(millis()-ledSeries3.startTime<ledSeries3.offInterval){
-      analogWrite(ledSeries3.ledPin,0);
-    }
-    else{
-      changeState(&ledSeries3);
-    }
-  }
-  
-  //raising
-  if(ledSeries3.state==2){
-    //Serial.println("rising");
-    if(ledSeries3.running==0){
-      ledSeries3.startTime=millis();
-      ledSeries3.running=1;
-    }
-    if(millis()-ledSeries3.startTime<ledSeries3.raiseInterval){
-      long diff=ledSeries3.raiseInterval-(millis()-ledSeries3.startTime);
-      long pinVal=(1-diff/ledSeries3.raiseInterval)*ledSeries3.maxBrightness;
-      Serial.println(1-diff/ledSeries3.raiseInterval);
-
-      analogWrite(ledSeries3.ledPin,pinVal);
-    }
-    else{
-      changeState(&ledSeries3);
-    }
-  }
-  
-  //On
-  if(ledSeries3.state==3){
-    //Serial.println("on");
-    if(ledSeries3.running==0){
-      ledSeries3.startTime=millis();
-      ledSeries3.running=1;
-    }
-    if(millis()-ledSeries3.startTime<ledSeries3.onInterval){
-      //analogWrite(ledPin,255);
-    }
-    else{
-      changeState(&ledSeries3);
-    }
-  }    
-  //Lower
-  if(ledSeries3.state==4){
-    //Serial.println("Dimming");
-    if(ledSeries3.running==0){
-      ledSeries3.startTime=millis();
-      ledSeries3.running=1;
-    }
-    if(millis()-ledSeries3.startTime<ledSeries3.lowerInterval){
-      int diff=ledSeries3.lowerInterval-(millis()-ledSeries3.startTime);
-      int pinVal=ledSeries3.maxBrightness-(diff/ledSeries3.raiseInterval*ledSeries3.maxBrightness);
-      analogWrite(ledSeries3.ledPin,pinVal);
-
-    }
-    else{
-      changeState(&ledSeries3);
-    }
-  }      
 
 }
 
@@ -345,5 +134,81 @@ void changeState(ledSeries *ledSeriesX){
     ledSeriesX->state=0;
     ledSeriesX->running=0;  
   
+}
+
+void executeLedJob(ledSeries *ledSeriesX){
+
+  if(ledSeriesX->state==0){
+    generateRandomTimes(ledSeriesX);
+    ledSeriesX->state=1;
+  }
+
+  //state OFF
+  if(ledSeriesX->state==1){
+    //Serial.println("off");
+    if(ledSeriesX->running==0){
+      ledSeriesX->startTime=millis();
+      ledSeriesX->running=1;
+    }
+    if(millis()-ledSeriesX->startTime<ledSeriesX->offInterval){
+      analogWrite(ledSeriesX->ledPin,0);
+    }
+    else{
+      changeState(ledSeriesX);
+    }
+  }
+  
+  //raising
+  if(ledSeriesX->state==2){
+    //Serial.println("rising");
+    if(ledSeriesX->running==0){
+      ledSeriesX->startTime=millis();
+      ledSeriesX->running=1;
+    }
+    if(millis()-ledSeriesX->startTime<ledSeriesX->raiseInterval){
+      long diff=ledSeriesX->raiseInterval-(millis()-ledSeriesX->startTime);
+      long pinVal=(1-diff/ledSeriesX->raiseInterval)*ledSeriesX->maxBrightness;
+      Serial.println(1-diff/ledSeriesX->raiseInterval);
+
+      analogWrite(ledSeriesX->ledPin,pinVal);
+    }
+    else{
+      changeState(ledSeriesX);
+    }
+  }
+  
+  //On
+  if(ledSeriesX->state==3){
+    //Serial.println("on");
+    if(ledSeriesX->running==0){
+      ledSeriesX->startTime=millis();
+      ledSeriesX->running=1;
+    }
+    if(millis()-ledSeriesX->startTime<ledSeriesX->onInterval){
+      //analogWrite(ledPin,255);
+    }
+    else{
+      changeState(ledSeriesX);
+    }
+  }    
+  //Lower
+  if(ledSeriesX->state==4){
+    //Serial.println("Dimming");
+    if(ledSeriesX->running==0){
+      ledSeriesX->startTime=millis();
+      ledSeriesX->running=1;
+    }
+    if(millis()-ledSeriesX->startTime<ledSeriesX->lowerInterval){
+      int diff=ledSeriesX->lowerInterval-(millis()-ledSeriesX->startTime);
+      int pinVal=ledSeriesX->maxBrightness-(diff/ledSeriesX->raiseInterval*ledSeriesX->maxBrightness);
+      analogWrite(ledSeriesX->ledPin,pinVal);
+
+    }
+    else{
+      changeState(ledSeriesX);
+    }
+  }   
+
+
 }
 
